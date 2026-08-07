@@ -1,0 +1,31 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^apps/api/
+      - id: ruff-format
+        files: ^apps/api/
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        files: ^apps/web/
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy (api)
+        entry: bash -c 'cd apps/api && uv run mypy app'
+        language: system
+        files: ^apps/api/app/
+        pass_filenames: false
+
+      - id: eslint
+        name: eslint (web)
+        entry: bash -c 'pnpm --filter @verihire/web lint'
+        language: system
+        files: ^apps/web/
+        pass_filenames: false

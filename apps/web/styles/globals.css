@@ -1,0 +1,145 @@
+@import "tailwindcss";
+
+/*
+ * VeriHire design tokens — CLAUDE.md §7.
+ * Institutional trust with a signal layer: deep navy foundation, generous
+ * white space, restrained motion, and signal colours reserved exclusively
+ * for trust verdicts (never decorative, never a primary CTA).
+ */
+
+:root {
+  /* Brand */
+  --brand-navy-900: #0a1f44;
+  --brand-navy-700: #123163;
+  --brand-blue-600: #1d4ed8;
+  --brand-blue-100: #dbeafe;
+  --brand-crimson: #d62828;
+
+  /* Trust signal colours — reserved for verdicts only */
+  --signal-verified: #12a150;
+  --signal-caution: #f59e0b;
+  --signal-danger: #dc2626;
+
+  /* Ink & surface */
+  --ink-900: #0f172a;
+  --ink-500: #64748b;
+  --line-200: #e2e8f0;
+  --surface-50: #f6f8fc;
+  --surface-0: #ffffff;
+
+  /* Semantic roles (light) */
+  --background: var(--surface-50);
+  --surface: var(--surface-0);
+  --surface-raised: var(--surface-0);
+  --foreground: var(--ink-900);
+  --muted-foreground: var(--ink-500);
+  --border: var(--line-200);
+  --primary: var(--brand-blue-600);
+  --primary-foreground: var(--surface-0);
+  --accent: var(--brand-navy-900);
+  --accent-foreground: var(--surface-0);
+  --ring: var(--brand-blue-600);
+
+  /* Spacing scale — 4 8 12 16 24 32 48 64 only */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radii */
+  --radius-control: 12px;
+  --radius-card: 16px;
+  --radius-sheet: 24px;
+  --radius-pill: 9999px;
+
+  /* Motion */
+  --motion-duration: 200ms;
+  --motion-ease: ease-out;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--brand-navy-900);
+    --surface: var(--brand-navy-700);
+    --surface-raised: #16386f;
+    --foreground: #f1f5fb;
+    --muted-foreground: #a8b6cc;
+    --border: #24457f;
+    --primary: #4d7dff;
+    --primary-foreground: #0a1f44;
+    --accent: var(--brand-blue-600);
+    --accent-foreground: #ffffff;
+    --ring: #4d7dff;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+
+  --color-brand-navy-900: var(--brand-navy-900);
+  --color-brand-navy-700: var(--brand-navy-700);
+  --color-brand-blue-600: var(--brand-blue-600);
+  --color-brand-blue-100: var(--brand-blue-100);
+  --color-brand-crimson: var(--brand-crimson);
+
+  --color-signal-verified: var(--signal-verified);
+  --color-signal-caution: var(--signal-caution);
+  --color-signal-danger: var(--signal-danger);
+
+  --font-sans: var(--font-manrope);
+  --font-heading: var(--font-sora);
+
+  --radius-control: var(--radius-control);
+  --radius-card: var(--radius-card);
+  --radius-sheet: var(--radius-sheet);
+  --radius-pill: var(--radius-pill);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.01em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

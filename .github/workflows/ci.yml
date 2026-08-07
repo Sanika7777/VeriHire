@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API — lint, typecheck, test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "0.12.2"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: uv sync --all-extras
+
+      - name: Ruff
+        working-directory: apps/api
+        run: uv run ruff check .
+
+      - name: Mypy
+        working-directory: apps/api
+        run: uv run mypy app
+
+      - name: Pytest
+        working-directory: apps/api
+        run: uv run pytest --cov=app --cov-report=term-missing
+
+  web:
+    name: Web — lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: ESLint
+        run: pnpm --filter @verihire/web lint
+
+      - name: Typecheck
+        run: pnpm --filter @verihire/web typecheck
+
+      - name: Test
+        run: pnpm --filter @verihire/web test
+
+      - name: Build
+        run: pnpm --filter @verihire/web build
