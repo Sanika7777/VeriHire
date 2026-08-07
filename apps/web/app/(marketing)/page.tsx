@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { ResolveInput } from "@/components/verification/resolve-input";
+
 export const metadata: Metadata = {
   title: "VeriHire — Verify a recruiter before you apply",
 };
@@ -21,6 +23,7 @@ export default function MarketingHomePage() {
         returns a Trust Score with a full, explainable breakdown — never a
         black box.
       </p>
+      <ResolveInput />
     </main>
   );
 }

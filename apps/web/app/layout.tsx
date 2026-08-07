@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Manrope, Sora } from "next/font/google";
+import { Toaster } from "sonner";
 import "@/styles/globals.css";
+import { Providers } from "./providers";
 
 const sora = Sora({
   variable: "--font-sora",
@@ -53,7 +55,8 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        {children}
+        <Providers>{children}</Providers>
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   );

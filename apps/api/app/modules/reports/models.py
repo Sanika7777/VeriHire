@@ -1,10 +1,10 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Index, Integer, String, Text, text
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.enums import ReportCategory, ReportStatus, SubjectType
+from app.core.enums import ReportCategory, ReportStatus, SubjectType, pg_enum
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 
@@ -19,18 +19,16 @@ class Report(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
     subject_type: Mapped[SubjectType] = mapped_column(
-        Enum(SubjectType, name="subject_type", native_enum=True, create_type=False)
+        pg_enum(SubjectType, "subject_type", create_type=False)
     )
     subject_id: Mapped[uuid.UUID] = mapped_column(index=True)
 
     reporter_user_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
     )
-    category: Mapped[ReportCategory] = mapped_column(
-        Enum(ReportCategory, name="report_category", native_enum=True)
-    )
+    category: Mapped[ReportCategory] = mapped_column(pg_enum(ReportCategory, "report_category"))
     status: Mapped[ReportStatus] = mapped_column(
-        Enum(ReportStatus, name="report_status", native_enum=True),
+        pg_enum(ReportStatus, "report_status"),
         default=ReportStatus.PENDING,
         server_default=ReportStatus.PENDING.value,
     )

@@ -1,4 +1,4 @@
-.PHONY: dev api web worker migrate upgrade seed test e2e lint ml.data ml.train ml.eval
+.PHONY: dev api web worker migrate upgrade seed test e2e lint types ml.data ml.train ml.eval
 
 dev:
 	docker compose up --build
@@ -27,6 +27,9 @@ test:
 
 e2e:
 	pnpm --filter @verihire/web exec playwright test
+
+types: # regenerate packages/shared TS types from the running API's OpenAPI schema
+	pnpm --filter @verihire/shared generate
 
 lint:
 	cd apps/api && uv run ruff check . && uv run mypy app

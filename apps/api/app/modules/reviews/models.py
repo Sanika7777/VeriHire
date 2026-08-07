@@ -1,10 +1,10 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, Text, UniqueConstraint
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.enums import SubjectType
+from app.core.enums import SubjectType, pg_enum
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 
@@ -12,7 +12,7 @@ class Review(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "reviews"
 
     subject_type: Mapped[SubjectType] = mapped_column(
-        Enum(SubjectType, name="subject_type", native_enum=True, create_type=False)
+        pg_enum(SubjectType, "subject_type", create_type=False)
     )
     subject_id: Mapped[uuid.UUID] = mapped_column(index=True)
 

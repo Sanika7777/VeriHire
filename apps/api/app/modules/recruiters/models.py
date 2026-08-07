@@ -2,10 +2,10 @@ import uuid
 from datetime import date, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Index, String, Text
+from sqlalchemy import DateTime, ForeignKey, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.enums import EntityStatus
+from app.core.enums import EntityStatus, pg_enum
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
@@ -35,7 +35,7 @@ class Recruiter(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
     profile_created_on: Mapped[date | None] = mapped_column(nullable=True)
     status: Mapped[EntityStatus] = mapped_column(
-        Enum(EntityStatus, name="entity_status", native_enum=True, create_type=False),
+        pg_enum(EntityStatus, "entity_status", create_type=False),
         default=EntityStatus.UNVERIFIED,
         server_default=EntityStatus.UNVERIFIED.value,
     )

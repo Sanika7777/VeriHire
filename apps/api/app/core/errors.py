@@ -44,6 +44,18 @@ class UnauthorizedError(DomainError):
     status_code = status.HTTP_401_UNAUTHORIZED
 
 
+class AccountLockedError(DomainError):
+    type_slug = "account-locked"
+    title = "Account temporarily locked"
+    status_code = status.HTTP_423_LOCKED
+
+
+class NotConfiguredError(DomainError):
+    type_slug = "not-configured"
+    title = "Feature not configured"
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+
+
 class ForbiddenError(DomainError):
     type_slug = "forbidden"
     title = "Not permitted"
@@ -84,13 +96,17 @@ def _problem(
 def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(DomainError)
     async def handle_domain_error(request: Request, exc: DomainError) -> JSONResponse:
-        return _problem(
+        response = _problem(
             type_slug=exc.type_slug,
             title=exc.title,
             status_code=exc.status_code,
             detail=exc.detail,
             instance=str(request.url.path),
         )
+        retry_after = exc.extra.get("retry_after")
+        if retry_after is not None:
+            response.headers["Retry-After"] = str(retry_after)
+        return response
 
     @app.exception_handler(RequestValidationError)
     async def handle_validation_error(

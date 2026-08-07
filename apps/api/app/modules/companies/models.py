@@ -2,10 +2,10 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.enums import ClaimMethod, ClaimStatus, EntityStatus
+from app.core.enums import ClaimMethod, ClaimStatus, EntityStatus, pg_enum
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
@@ -37,7 +37,7 @@ class Company(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     registry_number: Mapped[str | None] = mapped_column(String(64), nullable=True)
     founded_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
     status: Mapped[EntityStatus] = mapped_column(
-        Enum(EntityStatus, name="entity_status", native_enum=True),
+        pg_enum(EntityStatus, "entity_status"),
         default=EntityStatus.UNVERIFIED,
         server_default=EntityStatus.UNVERIFIED.value,
     )
@@ -66,12 +66,10 @@ class EntityClaim(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
-    method: Mapped[ClaimMethod] = mapped_column(
-        Enum(ClaimMethod, name="claim_method", native_enum=True)
-    )
+    method: Mapped[ClaimMethod] = mapped_column(pg_enum(ClaimMethod, "claim_method"))
     verification_token: Mapped[str] = mapped_column(String(128))
     status: Mapped[ClaimStatus] = mapped_column(
-        Enum(ClaimStatus, name="claim_status", native_enum=True),
+        pg_enum(ClaimStatus, "claim_status"),
         default=ClaimStatus.PENDING,
         server_default=ClaimStatus.PENDING.value,
     )

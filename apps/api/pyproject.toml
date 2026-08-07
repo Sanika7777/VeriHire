@@ -22,6 +22,7 @@ dependencies = [
     "python-multipart>=0.0.17",
     "email-validator>=2.2.0",
     "pgvector>=0.3.6",
+    "aiosmtplib>=5.1.2",
 ]
 
 [dependency-groups]
@@ -42,6 +43,7 @@ package = false
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+extend-exclude = ["alembic/versions"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC"]
@@ -51,7 +53,7 @@ ignore = ["E501"]
 python_version = "3.12"
 strict = true
 plugins = ["pydantic.mypy"]
-exclude = ["tests/"]
+exclude = ["tests/", "alembic/versions/"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

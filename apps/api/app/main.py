@@ -9,6 +9,13 @@ from app.core.config import get_settings
 from app.core.errors import register_exception_handlers
 from app.core.health import router as health_router
 from app.core.logging import configure_logging, correlation_id_middleware
+from app.modules.admin.router import router as admin_router
+from app.modules.auth.router import router as auth_router
+from app.modules.companies.router import router as companies_router
+from app.modules.postings.router import router as postings_router
+from app.modules.recruiters.router import router as recruiters_router
+from app.modules.resolve.router import router as resolve_router
+from app.modules.search.router import router as search_router
 
 
 @asynccontextmanager
@@ -43,6 +50,13 @@ def create_app() -> FastAPI:
     register_exception_handlers(app)
 
     app.include_router(health_router)
+    app.include_router(auth_router, prefix=settings.api_prefix)
+    app.include_router(admin_router, prefix=settings.api_prefix)
+    app.include_router(companies_router, prefix=settings.api_prefix)
+    app.include_router(recruiters_router, prefix=settings.api_prefix)
+    app.include_router(postings_router, prefix=settings.api_prefix)
+    app.include_router(search_router, prefix=settings.api_prefix)
+    app.include_router(resolve_router, prefix=settings.api_prefix)
 
     return app
 

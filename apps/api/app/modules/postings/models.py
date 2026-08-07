@@ -3,10 +3,10 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.enums import EntityStatus
+from app.core.enums import EntityStatus, pg_enum
 from app.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
@@ -61,7 +61,7 @@ class JobPosting(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         Vector(EMBEDDING_DIM), nullable=True
     )
     status: Mapped[EntityStatus] = mapped_column(
-        Enum(EntityStatus, name="entity_status", native_enum=True, create_type=False),
+        pg_enum(EntityStatus, "entity_status", create_type=False),
         default=EntityStatus.UNVERIFIED,
         server_default=EntityStatus.UNVERIFIED.value,
     )

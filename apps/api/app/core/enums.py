@@ -1,27 +1,48 @@
 import enum
+from typing import Any
+
+from sqlalchemy import Enum as SAEnum
 
 
-class UserRole(str, enum.Enum):
+def pg_enum(enum_cls: type[enum.Enum], name: str, **kwargs: Any) -> SAEnum:
+    """Native Postgres enum storing member `.value` strings, not member names.
+
+    SQLAlchemy's `Enum` type stores Python enum *names* in the database by
+    default. Every enum in this module is a `str` enum whose `.value` is the
+    lowercase wire format used in server defaults, seeds and the API — so
+    every native enum column must be built through this helper to keep the
+    stored values consistent with those strings.
+    """
+    return SAEnum(
+        enum_cls,
+        name=name,
+        native_enum=True,
+        values_callable=lambda obj: [e.value for e in obj],
+        **kwargs,
+    )
+
+
+class UserRole(enum.StrEnum):
     SEEKER = "seeker"
     EMPLOYER = "employer"
     MODERATOR = "moderator"
     ADMIN = "admin"
 
 
-class TrustBand(str, enum.Enum):
+class TrustBand(enum.StrEnum):
     UNRATED = "unrated"
     HIGH_RISK = "high_risk"
     CAUTION = "caution"
     TRUSTED = "trusted"
 
 
-class SubjectType(str, enum.Enum):
+class SubjectType(enum.StrEnum):
     COMPANY = "company"
     RECRUITER = "recruiter"
     JOB_POSTING = "job_posting"
 
 
-class EntityStatus(str, enum.Enum):
+class EntityStatus(enum.StrEnum):
     UNVERIFIED = "unverified"
     CLAIMED = "claimed"
     VERIFIED = "verified"
@@ -30,7 +51,7 @@ class EntityStatus(str, enum.Enum):
     REMOVED = "removed"
 
 
-class ReportCategory(str, enum.Enum):
+class ReportCategory(enum.StrEnum):
     ADVANCE_FEE = "advance_fee"
     FAKE_JOB_POSTING = "fake_job_posting"
     IMPERSONATION = "impersonation"
@@ -41,7 +62,7 @@ class ReportCategory(str, enum.Enum):
     OTHER = "other"
 
 
-class ReportStatus(str, enum.Enum):
+class ReportStatus(enum.StrEnum):
     PENDING = "pending"
     UNDER_REVIEW = "under_review"
     CONFIRMED = "confirmed"
@@ -49,18 +70,18 @@ class ReportStatus(str, enum.Enum):
     APPEALED = "appealed"
 
 
-class ClaimMethod(str, enum.Enum):
+class ClaimMethod(enum.StrEnum):
     DNS_TXT = "dns_txt"
     EMAIL_DOMAIN = "email_domain"
 
 
-class ClaimStatus(str, enum.Enum):
+class ClaimStatus(enum.StrEnum):
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
 
 
-class SignalSeverity(str, enum.Enum):
+class SignalSeverity(enum.StrEnum):
     INFO = "info"
     LOW = "low"
     MEDIUM = "medium"
@@ -68,7 +89,7 @@ class SignalSeverity(str, enum.Enum):
     CRITICAL = "critical"
 
 
-class SubScoreCode(str, enum.Enum):
+class SubScoreCode(enum.StrEnum):
     IDENTITY = "identity"
     COMPANY_LEGITIMACY = "company_legitimacy"
     CONTENT_RISK = "content_risk"
@@ -76,7 +97,7 @@ class SubScoreCode(str, enum.Enum):
     COMMUNITY_SIGNAL = "community_signal"
 
 
-class VerificationStatus(str, enum.Enum):
+class VerificationStatus(enum.StrEnum):
     PENDING = "pending"
     RESOLVING = "resolving"
     FETCHING = "fetching"

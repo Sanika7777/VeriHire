@@ -19,13 +19,14 @@ class Settings(BaseSettings):
 
     api_prefix: str = "/api/v1"
     cors_origins: list[str] = ["http://localhost:3000"]
+    frontend_url: str = "http://localhost:3000"
 
     database_url: PostgresDsn = PostgresDsn(
         "postgresql+asyncpg://verihire:verihire@localhost:5432/verihire"
     )
     redis_url: RedisDsn = RedisDsn("redis://localhost:6379/0")
 
-    jwt_secret: SecretStr = SecretStr("dev-secret-change-me")
+    jwt_secret: SecretStr = SecretStr("dev-secret-change-me-in-production-min-32-bytes")
     jwt_algorithm: str = "HS256"
     access_token_ttl_minutes: int = 15
     refresh_token_ttl_days: int = 30

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -12,6 +12,7 @@ from app.core.enums import (
     SubScoreCode,
     TrustBand,
     VerificationStatus,
+    pg_enum,
 )
 from app.db.base import Base, UUIDPrimaryKeyMixin
 
@@ -39,14 +40,12 @@ class Verification(UUIDPrimaryKeyMixin, Base):
         ),
     )
 
-    subject_type: Mapped[SubjectType] = mapped_column(
-        Enum(SubjectType, name="subject_type", native_enum=True)
-    )
+    subject_type: Mapped[SubjectType] = mapped_column(pg_enum(SubjectType, "subject_type"))
     subject_id: Mapped[uuid.UUID] = mapped_column(index=True)
 
     score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     band: Mapped[TrustBand] = mapped_column(
-        Enum(TrustBand, name="trust_band", native_enum=True),
+        pg_enum(TrustBand, "trust_band"),
         default=TrustBand.UNRATED,
     )
     sub_scores: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
@@ -58,7 +57,7 @@ class Verification(UUIDPrimaryKeyMixin, Base):
     )
 
     status: Mapped[VerificationStatus] = mapped_column(
-        Enum(VerificationStatus, name="verification_status", native_enum=True),
+        pg_enum(VerificationStatus, "verification_status"),
         default=VerificationStatus.PENDING,
     )
     error_detail: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -95,12 +94,10 @@ class VerificationSignal(UUIDPrimaryKeyMixin, Base):
     verification_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("verifications.id", ondelete="CASCADE"), index=True
     )
-    sub_score_code: Mapped[SubScoreCode] = mapped_column(
-        Enum(SubScoreCode, name="sub_score_code", native_enum=True)
-    )
+    sub_score_code: Mapped[SubScoreCode] = mapped_column(pg_enum(SubScoreCode, "sub_score_code"))
     code: Mapped[str] = mapped_column(String(64))
     severity: Mapped[SignalSeverity] = mapped_column(
-        Enum(SignalSeverity, name="signal_severity", native_enum=True)
+        pg_enum(SignalSeverity, "signal_severity")
     )
     title: Mapped[str] = mapped_column(String(200))
     detail: Mapped[str] = mapped_column(Text)

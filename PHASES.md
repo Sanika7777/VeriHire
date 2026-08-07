@@ -265,9 +265,9 @@ Keep a table at the bottom of this file and update it as phases complete.
 
 | Phase | Status | Completed | Notes |
 |---|---|---|---|
-| 0 Foundations | ☐ | | |
-| 1 Data model | ☐ | | |
-| 2 Auth | ☐ | | |
+| 0 Foundations | ☑ | 2026-08-07 | Docker unavailable in build sandbox — compose/Dockerfiles written but not exercised; verify `make dev` on a Docker-capable machine. |
+| 1 Data model | ☑ | 2026-08-07 | Full upgrade→downgrade→upgrade cycle verified against real Postgres 16 + pg_trgm + pgvector. |
+| 2 Auth | ☑ | 2026-08-07 | Register/login/refresh/logout, Argon2id, rotation+reuse detection, lockout, email verify + password reset (MailHog/Resend), Google OAuth (Authorization Code + PKCE), role guards, rate limiting. Frontend: login/register/forgot/reset/verify-email pages, in-memory access token, transparent refresh. 20 backend tests + a real headless-browser e2e session passing. Google OAuth logic unit-tested with mocked Google calls — the live handshake itself needs real Google OAuth credentials to exercise. |
 | 3 Entities & search | ☐ | | |
 | 4 ML model | ☐ | | |
 | 5 Trust Score engine | ☐ | | |
