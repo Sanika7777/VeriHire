@@ -23,6 +23,11 @@ dependencies = [
     "email-validator>=2.2.0",
     "pgvector>=0.3.6",
     "aiosmtplib>=5.1.2",
+    "pandas>=3.0.5",
+    "scikit-learn>=1.9.0",
+    "lightgbm>=4.7.0",
+    "joblib>=1.5.3",
+    "scipy>=1.18.0",
 ]
 
 [dependency-groups]
@@ -54,6 +59,10 @@ python_version = "3.12"
 strict = true
 plugins = ["pydantic.mypy"]
 exclude = ["tests/", "alembic/versions/"]
+
+[[tool.mypy.overrides]]
+module = ["joblib", "pandas", "lightgbm", "sklearn.*", "scipy.*", "dns.*", "shap.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

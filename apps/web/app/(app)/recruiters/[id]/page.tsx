@@ -2,7 +2,9 @@ import type { components } from "@verihire/shared";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { VerdictBadge } from "@/components/verification/verdict-badge";
+import { ReviewComposer } from "@/components/reviews/review-composer";
+import { ReviewList } from "@/components/reviews/review-list";
+import { VerificationPanel } from "@/components/verification/verification-panel";
 import { serverFetch } from "@/lib/api-client/server-fetch";
 
 type RecruiterRead = components["schemas"]["RecruiterRead"];
@@ -32,17 +34,14 @@ export default async function RecruiterDetailPage({
 
   return (
     <main id="main-content" className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-foreground">{recruiter.full_name}</h1>
-          {recruiter.headline ? (
-            <p className="mt-1 text-sm text-muted-foreground">{recruiter.headline}</p>
-          ) : null}
-        </div>
-        <VerdictBadge band="unrated" />
+      <div>
+        <h1 className="text-2xl font-semibold text-foreground">{recruiter.full_name}</h1>
+        {recruiter.headline ? (
+          <p className="mt-1 text-sm text-muted-foreground">{recruiter.headline}</p>
+        ) : null}
       </div>
 
-      <p className="mt-6 text-sm text-foreground">
+      <p className="mt-4 text-sm text-foreground">
         {recruiter.bio ?? "No bio has been added for this recruiter yet."}
       </p>
 
@@ -51,16 +50,23 @@ export default async function RecruiterDetailPage({
           href={recruiter.linkedin_url}
           target="_blank"
           rel="noopener noreferrer nofollow"
-          className="mt-6 inline-block text-sm font-medium text-primary"
+          className="mt-4 inline-block text-sm font-medium text-primary"
         >
           View LinkedIn profile ↗
         </a>
       ) : null}
 
-      <p className="mt-8 text-xs text-muted-foreground">
-        This recruiter hasn&apos;t been verified yet — a full Trust Score breakdown lands in a
-        later phase of this build.
-      </p>
+      <div className="mt-8">
+        <VerificationPanel subjectType="recruiter" subjectId={recruiter.id} />
+      </div>
+
+      <div className="mt-8">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground">Reviews</h2>
+          <ReviewComposer subjectType="recruiter" subjectId={recruiter.id} />
+        </div>
+        <ReviewList subjectType="recruiter" subjectId={recruiter.id} />
+      </div>
     </main>
   );
 }

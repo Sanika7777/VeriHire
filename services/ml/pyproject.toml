@@ -1,0 +1,31 @@
+[project]
+name = "verihire-ml"
+version = "0.1.0"
+description = "VeriHire fraud-detection and link-safety models"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.2.0",
+    "numpy>=1.26.0",
+    "scikit-learn>=1.5.0",
+    "lightgbm>=4.5.0",
+    "scipy>=1.14.0",
+    "joblib>=1.4.0",
+    "shap>=0.46.0",
+    "matplotlib>=3.9.0",
+    "numba>=0.60.0",
+    "llvmlite>=0.43.0",
+    "pyarrow>=25.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "ruff>=0.8.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

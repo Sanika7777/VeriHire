@@ -1,13 +1,17 @@
 import uuid
 from datetime import UTC, datetime
 
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.errors import NotFoundError
+from app.core.enums import EntityStatus
+from app.core.errors import ConflictError, NotFoundError
 from app.core.pagination import Page, decode_cursor, paginate_rows
 from app.modules.companies.models import Company
 from app.modules.companies.repository import CompanyRepository
 from app.modules.companies.schemas import CompanyCreate, CompanyRead, CompanyUpdate, slugify
+from app.modules.postings.models import JobPosting
+from app.modules.recruiters.models import Recruiter
 
 DEFAULT_PAGE_SIZE = 20
 MAX_PAGE_SIZE = 100
@@ -74,3 +78,27 @@ class CompanyService:
         company = await self.get(company_id)
         company.deleted_at = datetime.now(UTC)
         await self.session.flush()
+
+    async def merge(self, source_id: uuid.UUID, target_id: uuid.UUID) -> Company:
+        if source_id == target_id:
+            raise ConflictError("Cannot merge a company into itself.")
+
+        source = await self.get(source_id)
+        target = await self.get(target_id)
+
+        # Reassign postings and recruiters pointing at the duplicate before
+        # retiring it, so they don't silently become orphaned.
+        await self.session.execute(
+            update(Recruiter).where(Recruiter.company_id == source_id).values(company_id=target_id)
+        )
+        await self.session.execute(
+            update(JobPosting)
+            .where(JobPosting.company_id == source_id)
+            .values(company_id=target_id)
+        )
+
+        source.merged_into_id = target.id
+        source.status = EntityStatus.MERGED
+        source.deleted_at = datetime.now(UTC)
+        await self.session.flush()
+        return target

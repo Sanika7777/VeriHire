@@ -27,7 +27,10 @@
   --surface-50: #f6f8fc;
   --surface-0: #ffffff;
 
-  /* Semantic roles (light) */
+  /* Semantic roles (light). --surface-0/--surface-50 double as both the raw
+   * brand constants above and the input/card-background role below — in
+   * light mode they're identical, so this is harmless; dark mode overrides
+   * them independently. */
   --background: var(--surface-50);
   --surface: var(--surface-0);
   --surface-raised: var(--surface-0);
@@ -61,11 +64,15 @@
   --motion-ease: ease-out;
 }
 
+/* System default ("no explicit choice") follows the OS. A manual toggle
+ * (next-themes, via app/providers.tsx) stamps data-theme="dark|light" on
+ * <html>, which must win over the media query in both directions. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --background: var(--brand-navy-900);
     --surface: var(--brand-navy-700);
     --surface-raised: #16386f;
+    --surface-0: #0e274f;
     --foreground: #f1f5fb;
     --muted-foreground: #a8b6cc;
     --border: #24457f;
@@ -77,10 +84,27 @@
   }
 }
 
+:root[data-theme="dark"] {
+  --background: var(--brand-navy-900);
+  --surface: var(--brand-navy-700);
+  --surface-raised: #16386f;
+  --surface-0: #0e274f;
+  --foreground: #f1f5fb;
+  --muted-foreground: #a8b6cc;
+  --border: #24457f;
+  --primary: #4d7dff;
+  --primary-foreground: #0a1f44;
+  --accent: var(--brand-blue-600);
+  --accent-foreground: #ffffff;
+  --ring: #4d7dff;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
+  --color-surface-0: var(--surface-0);
+  --color-surface-50: var(--surface-50);
   --color-foreground: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);

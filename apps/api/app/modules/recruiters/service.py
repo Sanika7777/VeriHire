@@ -1,10 +1,13 @@
 import uuid
 from datetime import UTC, datetime
 
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.enums import EntityStatus
 from app.core.errors import ConflictError, NotFoundError
 from app.core.pagination import Page, decode_cursor, paginate_rows
+from app.modules.postings.models import JobPosting
 from app.modules.recruiters.models import Recruiter
 from app.modules.recruiters.repository import RecruiterRepository
 from app.modules.recruiters.schemas import RecruiterCreate, RecruiterRead, RecruiterUpdate
@@ -60,3 +63,22 @@ class RecruiterService:
         recruiter = await self.get(recruiter_id)
         recruiter.deleted_at = datetime.now(UTC)
         await self.session.flush()
+
+    async def merge(self, source_id: uuid.UUID, target_id: uuid.UUID) -> Recruiter:
+        if source_id == target_id:
+            raise ConflictError("Cannot merge a recruiter into itself.")
+
+        source = await self.get(source_id)
+        target = await self.get(target_id)
+
+        await self.session.execute(
+            update(JobPosting)
+            .where(JobPosting.recruiter_id == source_id)
+            .values(recruiter_id=target_id)
+        )
+
+        source.merged_into_id = target.id
+        source.status = EntityStatus.MERGED
+        source.deleted_at = datetime.now(UTC)
+        await self.session.flush()
+        return target

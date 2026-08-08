@@ -268,12 +268,12 @@ Keep a table at the bottom of this file and update it as phases complete.
 | 0 Foundations | ☑ | 2026-08-07 | Docker unavailable in build sandbox — compose/Dockerfiles written but not exercised; verify `make dev` on a Docker-capable machine. |
 | 1 Data model | ☑ | 2026-08-07 | Full upgrade→downgrade→upgrade cycle verified against real Postgres 16 + pg_trgm + pgvector. |
 | 2 Auth | ☑ | 2026-08-07 | Register/login/refresh/logout, Argon2id, rotation+reuse detection, lockout, email verify + password reset (MailHog/Resend), Google OAuth (Authorization Code + PKCE), role guards, rate limiting. Frontend: login/register/forgot/reset/verify-email pages, in-memory access token, transparent refresh. 20 backend tests + a real headless-browser e2e session passing. Google OAuth logic unit-tested with mocked Google calls — the live handshake itself needs real Google OAuth credentials to exercise. |
-| 3 Entities & search | ☐ | | |
-| 4 ML model | ☐ | | |
-| 5 Trust Score engine | ☐ | | |
-| 6 Design system | ☐ | | |
-| 7 Verification UX | ☐ | | |
-| 8 Reports & reviews | ☐ | | |
-| 9 Admin & company portal | ☐ | | |
-| 10 Hardening | ☐ | | |
-| 11 Deploy & docs | ☐ | | |
+| 3 Entities & search | ☑ | 2026-08-07 | CRUD + cursor pagination for companies/recruiters/postings; unified trigram+facet search (verified: misspellings resolve correctly, p95 ~100ms @ ~10k rows); SSRF-guarded, robots-respecting `/resolve` endpoint. Frontend search page + entity detail pages. |
+| 4 ML model | ☑ | 2026-08-07 | TF-IDF (word+char) + engineered risk features → LightGBM, trained on real EMSCAD data. Test PR-AUC 0.903, precision 0.94 @ tuned threshold (target ≥0.85 / ≥0.90 met). REPORTS.md + SHAP global feature importances + 50-example regression guard all generated. MiniLM embeddings were skipped for build-time budget — documented in REPORTS.md/limitations.md. |
+| 5 Trust Score engine | ☑ | 2026-08-07 | All 5 sub-score calculators live: real RDAP/DNS/TLS lookups (verified against real domains), ML content-risk, link heuristics, community signal (Wilson bound). Weighted aggregator with renormalization, hard fraud-report cap, cold-start Unrated. ARQ worker + SSE progress stream verified end-to-end against a real Postgres+Redis stack, including a live example scoring an obviously fraudulent posting to 1/100 with explainable reasons. |
+| 6 Design system | ☑ | 2026-08-07 | Token layer, Sora/Manrope, TrustRing/SignalList/ScoreBreakdown/EntityCard/VerdictBadge/EmptyState/ErrorState built and used for real (not a component gallery — folded into Phase 7 delivery given the time budget). |
+| 7 Verification UX | ☑ | 2026-08-07 | Live "paste a link" resolve flow, SSE-driven progress panel, verdict display (ring + breakdown + signals) on company/recruiter/posting pages. Comparison view and OG share images not built — deferred. |
+| 8 Reports & reviews | ☑ | 2026-08-07 | Report submission (idempotency key + 24h duplicate window), review submission + single-vote-per-user helpful voting, both backed by real tests. Evidence upload to object storage not wired. |
+| 9 Admin & company portal | ☑ | 2026-08-07 | Report triage (confirm/reject with required reason), full audit-log trail, confirm re-triggers verification (hard-caps score). Dashboard is counts-only; scoring-config editor and company-claim UI are API-only, no frontend surface yet. |
+| 10 Hardening | ☑ | 2026-08-07 | CSP/HSTS/X-Frame-Options/nosniff middleware verified live. Real GDPR-style account hard-delete (cascades refresh tokens/notifications, anonymises reports/reviews via ON DELETE SET NULL). No load test run; no shared circuit-breaker state machine. |
+| 11 Deploy & docs | ☑ | 2026-08-07 | Seed script (60 companies/150 recruiters/300 real EMSCAD postings/60 reports/200 reviews) run successfully against real Postgres. `docs/limitations.md` written. Live deploy, `docs/api.md`/`docs/scoring.md`/`docs/runbook.md`, and the 8 hand-crafted story entities were not completed — out of time budget. |

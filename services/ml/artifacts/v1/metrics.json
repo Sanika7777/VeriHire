@@ -1,0 +1,26 @@
+{
+  "model_version": "v1",
+  "seed": 42,
+  "baseline_val_pr_auc": 0.8864,
+  "main_val_pr_auc": 0.9319,
+  "operating_threshold": 0.412,
+  "test": {
+    "pr_auc": 0.903,
+    "roc_auc": 0.9879,
+    "precision": 0.94,
+    "recall": 0.7231,
+    "f1": 0.8174,
+    "confusion_matrix": [
+      [
+        2546,
+        6
+      ],
+      [
+        36,
+        94
+      ]
+    ],
+    "support_positive": 130,
+    "support_total": 2682
+  }
+}

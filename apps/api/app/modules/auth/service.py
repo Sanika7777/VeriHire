@@ -3,8 +3,10 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from redis.asyncio import Redis
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
@@ -29,6 +31,8 @@ from app.integrations.google_oauth import (
     build_authorization_url,
     exchange_code_for_userinfo,
 )
+from app.modules.reports.models import Report
+from app.modules.reviews.models import Review
 from app.modules.users.models import RefreshToken, User
 from app.modules.users.repository import RefreshTokenRepository, UserRepository
 
@@ -320,3 +324,66 @@ class AuthService:
 
         tokens = await self.issue_token_pair(user)
         return user, tokens
+
+    async def delete_account(self, user_id: uuid.UUID) -> None:
+        """Genuinely deletes the account (CLAUDE.md §9: not a soft flag).
+
+        Refresh tokens and notifications cascade-delete via their FKs.
+        Reports and reviews the user authored are NOT deleted — they are
+        community safety data — but `reporter_user_id`/`reviewer_user_id`
+        are nulled out (ON DELETE SET NULL) so the content survives
+        anonymised.
+        """
+        user = await self.users.get_by_id(user_id)
+        if user is None:
+            raise UnauthorizedError("Account no longer exists.")
+        await self.session.delete(user)
+        await self.session.flush()
+
+    async def export_account_data(self, user_id: uuid.UUID) -> dict[str, Any]:
+        """A machine-readable export of everything tied to this account
+        (CLAUDE.md §9 data protection: a data-export endpoint, implemented
+        for real rather than as a flag)."""
+        user = await self.users.get_by_id(user_id)
+        if user is None:
+            raise UnauthorizedError("Account no longer exists.")
+
+        reports_result = await self.session.execute(
+            select(Report).where(Report.reporter_user_id == user_id)
+        )
+        reviews_result = await self.session.execute(
+            select(Review).where(Review.reviewer_user_id == user_id)
+        )
+
+        return {
+            "profile": {
+                "id": str(user.id),
+                "email": user.email,
+                "full_name": user.full_name,
+                "role": user.role.value,
+                "email_verified": user.email_verified,
+                "created_at": user.created_at.isoformat(),
+            },
+            "reports_filed": [
+                {
+                    "id": str(r.id),
+                    "subject_type": r.subject_type.value,
+                    "subject_id": str(r.subject_id),
+                    "category": r.category.value,
+                    "status": r.status.value,
+                    "description": r.description,
+                    "created_at": r.created_at.isoformat(),
+                }
+                for r in reports_result.scalars().all()
+            ],
+            "reviews_written": [
+                {
+                    "id": str(rv.id),
+                    "subject_type": rv.subject_type.value,
+                    "subject_id": str(rv.subject_id),
+                    "body": rv.body,
+                    "created_at": rv.created_at.isoformat(),
+                }
+                for rv in reviews_result.scalars().all()
+            ],
+        }

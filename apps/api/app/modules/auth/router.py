@@ -126,6 +126,21 @@ async def me(user: CurrentUser) -> UserRead:
     return UserRead.model_validate(user)
 
 
+@router.delete("/me", status_code=204)
+async def delete_me(
+    response: Response,
+    user: CurrentUser,
+    auth_service: AuthServiceDep,
+) -> None:
+    await auth_service.delete_account(user.id)
+    _clear_refresh_cookie(response)
+
+
+@router.get("/me/export")
+async def export_me(user: CurrentUser, auth_service: AuthServiceDep) -> dict[str, object]:
+    return await auth_service.export_account_data(user.id)
+
+
 @router.post(
     "/forgot-password",
     response_model=MessageResponse,
