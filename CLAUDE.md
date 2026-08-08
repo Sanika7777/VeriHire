@@ -110,7 +110,7 @@ verihire/
 │     │  │  ├─ auth/ users/ recruiters/ companies/
 │     │  │  ├─ postings/ verification/ reports/ reviews/ admin/
 │     │  │  └─ each: router.py schemas.py service.py models.py repository.py
-│     │  ├─ integrations/     # whois, dns, opencorporates, safe-browsing
+│     │  ├─ integrations/     # whois, dns, safe-browsing
 │     │  └─ workers/          # ARQ tasks
 │     └─ tests/
 ├─ services/ml/
@@ -134,7 +134,7 @@ Five weighted sub-scores, each 0–100, each producing human-readable **signals*
 | Sub-score | Weight | Inputs |
 |---|---|---|
 | `identity` | 20% | Email domain matches claimed company, profile completeness, account age, verified contact, corroborating profiles |
-| `company_legitimacy` | 25% | Company registry match, domain age (WHOIS), valid MX records, HTTPS + cert age, careers page reachable, employee-count plausibility |
+| `company_legitimacy` | 25% | Domain age (WHOIS/RDAP), valid MX/SPF/DMARC records, HTTPS + cert age, careers page reachable, employee-count plausibility. (Company registry match was evaluated — OpenCorporates — and dropped: paid, and weak Indian-jurisdiction coverage anyway.) |
 | `content_risk` | 30% | ML fraud probability over posting text + metadata (§3 ML), keyword risk families (advance fee, "no experience, high pay", personal-email contact, urgency pressure), salary-plausibility outlier check |
 | `link_safety` | 10% | URL lexical model, TLD reputation, redirect chain depth, IP-literal hosts, shortener resolution, blocklist lookup |
 | `community_signal` | 15% | Confirmed report count (time-decayed), report-to-view ratio, Wilson lower bound on review ratings, reviewer credibility weighting |
@@ -145,7 +145,7 @@ Five weighted sub-scores, each 0–100, each producing human-readable **signals*
 - Bands: `0–39 High Risk` (red), `40–69 Caution` (amber), `70–100 Trusted` (green).
 - **Hard override:** any confirmed fraud report caps the score at 25 and forces the `High Risk` band, regardless of other sub-scores.
 - Cold start: an entity with no data returns `Unrated`, never a default 50. Never invent confidence we don't have.
-- Every score is recomputed asynchronously when new evidence arrives (new report, new review, registry refresh) via an ARQ job.
+- Every score is recomputed asynchronously when new evidence arrives (new report, new review, domain re-check) via an ARQ job.
 
 ---
 
@@ -196,7 +196,7 @@ A route is not complete until all of these exist:
 - [ ] **Loading state** — content-shaped skeletons, not a spinner
 - [ ] **Empty state** — illustration/icon, one sentence of guidance, a primary action
 - [ ] **Error state** — retry affordance, plain-language message, never a raw stack trace
-- [ ] **Partial/degraded state** — e.g. score computed but registry lookup timed out; say so, don't hide it
+- [ ] **Partial/degraded state** — e.g. score computed but a WHOIS/RDAP lookup timed out; say so, don't hide it
 - [ ] **Real content** — Indian names, INR amounts, plausible company names, realistic timestamps
 - [ ] **Responsive** at 360 / 768 / 1280 / 1600
 - [ ] **Keyboard reachable**, visible focus rings, correct heading order, `aria-live` on async results

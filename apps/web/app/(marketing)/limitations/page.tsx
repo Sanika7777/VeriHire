@@ -32,9 +32,10 @@ export default function LimitationsPage() {
 
       <h2 className="mt-8 text-lg font-semibold text-foreground">Coverage gaps</h2>
       <p className="mt-2 text-foreground">
-        Company registry and domain-age checks depend on external data sources that don&apos;t
-        cover every company or every country. When a check can&apos;t run, we say so — an absent
-        signal is shown as &quot;unrated,&quot; never guessed at as a default middling score.
+        Domain-age, DNS, and certificate checks depend on external data sources that don&apos;t
+        cover every company or every country, and we don&apos;t run a company registry check at
+        all. When a check can&apos;t run, we say so — an absent signal is shown as
+        &quot;unrated,&quot; never guessed at as a default middling score.
       </p>
 
       <h2 className="mt-8 text-lg font-semibold text-foreground">Community signal is gameable</h2>

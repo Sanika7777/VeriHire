@@ -24,9 +24,9 @@ the admin console; otherwise stay signed out or use a seeker account.
 
 1. Search **"Bluepeak Consulting"**.
 2. Its score is **54, Caution (amber)** — call out that this is the honest
-   middle: no registry match found (inconclusive on its own for a small
-   consultancy), one salary outlier, mixed reviews. Nothing here proves
-   fraud, and the product doesn't pretend otherwise.
+   middle: no SPF/DMARC on its mail domain (inconclusive on its own for a
+   small consultancy), one salary outlier, mixed reviews. Nothing here
+   proves fraud, and the product doesn't pretend otherwise.
 
 ## 3. A confirmed scam, hard-capped (45s)
 

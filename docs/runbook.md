@@ -76,12 +76,15 @@ from `apps/api`).
 **Fix**: `make ml.data && make ml.train` from `services/ml`, or verify
 `ML_ARTIFACTS_DIR` in `.env` resolves correctly from `apps/api`.
 
-### RDAP/DNS/registry checks all show "unavailable"
+### RDAP/DNS/link-safety checks all show "unavailable"
 
 **Cause**: no outbound network access from the API process (sandboxed
-environment), or `OPENCORPORATES_API_KEY` / `SAFE_BROWSING_API_KEY` aren't
-set. This is expected, graceful degradation — verification still completes
-with `Unrated` on the affected sub-score dimensions, per CLAUDE.md §5.
+environment), or `SAFE_BROWSING_API_KEY` isn't set. This is expected,
+graceful degradation — verification still completes with `Unrated` on the
+affected sub-score dimensions, per CLAUDE.md §5. (There is no company
+registry check — OpenCorporates was evaluated and dropped as a paid
+integration with weak Indian-jurisdiction coverage; `company_legitimacy`
+runs on WHOIS/RDAP, DNS, and TLS checks only.)
 
 ## Rotating the scoring config
 

@@ -13,7 +13,7 @@ Each sub-score is 0–100, computed independently, and can also be `Unrated`
 | Sub-score | Weight | What it checks | Source |
 |---|---|---|---|
 | **Identity** | 20% | Profile completeness, email-domain match to claimed employer, corroborating LinkedIn profile, account age | `scoring/identity.py` |
-| **Company legitimacy** | 25% | Domain registration age (RDAP), DNS MX/SPF/DMARC, TLS certificate age, company registry match | `scoring/company_legitimacy.py` |
+| **Company legitimacy** | 25% | Domain registration age (RDAP), DNS MX/SPF/DMARC, TLS certificate age | `scoring/company_legitimacy.py` |
 | **Content risk** | 30% | A LightGBM model trained on real fraud/legitimate job postings, **plus** an independent, rule-based keyword-family check (advance-fee language, WhatsApp/Telegram handoff, personal-email contact, urgency pressure) that caps the score regardless of what the model alone says | `scoring/content_risk.py`, `services/ml` |
 | **Link safety** | 10% | HTTPS presence, IP-literal hosts, URL shorteners, low-trust TLDs, Google Safe Browsing (when configured) | `scoring/link_safety.py` |
 | **Community signal** | 15% | Confirmed fraud reports (time-decayed), pending report volume, Wilson-lower-bound review ratings | `scoring/community_signal.py` |
@@ -80,7 +80,8 @@ missed a phrase that, on its own, is a decisive scam indicator. See
 ## What this methodology does not do
 
 See `docs/limitations.md` for the full account — briefly: the content-risk
-model is trained on 2012–2014 US-skewed data, registry/blocklist checks
-degrade gracefully when unconfigured rather than failing scoring outright,
-and community signal is gameable at low volume. A Trust Score is advisory,
-never a determination of guilt.
+model is trained on 2012–2014 US-skewed data, there is no company registry
+check (evaluated and dropped — see limitations doc), the Safe Browsing
+blocklist check degrades gracefully when unconfigured rather than failing
+scoring outright, and community signal is gameable at low volume. A Trust
+Score is advisory, never a determination of guilt.

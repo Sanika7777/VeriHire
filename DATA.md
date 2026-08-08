@@ -95,8 +95,7 @@ These feed `identity` and `company_legitimacy`. Wrap each behind an interface wi
 | **RDAP / WHOIS** | Domain registration age | Free. A domain registered 11 days ago advertising a "senior" role is a strong signal. |
 | **DNS records (MX, SPF, DMARC)** | Does the company actually operate email at this domain? | Free, fast, very high signal. Scam "companies" rarely configure DMARC. |
 | **TLS certificate metadata** | Cert issuer and age | Free via the TLS handshake. |
-| **OpenCorporates** | Company registry match across jurisdictions | Free tier available; register for an API key. |
-| **MCA / data.gov.in** | Indian company registration data | Useful for the India-first positioning; check current availability and terms. |
+| **MCA / data.gov.in** | Indian company registration data | Useful for the India-first positioning; check current availability and terms. Not integrated yet. (OpenCorporates was evaluated and dropped — its free tier doesn't cover Indian jurisdictions well and a paid plan isn't worth it for this product.) |
 | **Google Safe Browsing API** | URL blocklist | Free tier, generous quota. |
 | **Certificate Transparency logs (crt.sh)** | Detect lookalike domains registered against a verified brand — powers impersonation alerts | Free. |
 
@@ -144,7 +143,7 @@ services/ml/
 | Sub-score | Weight | Data source |
 |---|---|---|
 | `identity` | 20% | Live: DNS, email domain match, profile completeness, account age |
-| `company_legitimacy` | 25% | Live: RDAP, MX/SPF/DMARC, TLS, OpenCorporates, MCA |
+| `company_legitimacy` | 25% | Live: RDAP, MX/SPF/DMARC, TLS (company registry match dropped — see §3) |
 | `content_risk` | 30% | **EMSCAD model** + hand-crafted risk phrase families |
 | `link_safety` | 10% | **PhiUSIIL model** + Safe Browsing + redirect analysis |
 | `community_signal` | 15% | Our own `reports` and `reviews` tables |

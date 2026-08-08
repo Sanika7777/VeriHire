@@ -295,11 +295,11 @@ async def seed_story_entities(session: AsyncSession, moderator: User) -> dict[st
         },
         signals=[
             _signal(
-                "company_legitimacy", "no_registry_match", "medium",
-                "No company registry match found",
-                "No matching entity was found in available company registry lookups — "
-                "this alone is not conclusive, as many small consultancies register "
-                "under a parent LLP not searchable here.",
+                "company_legitimacy", "email_auth_missing", "medium",
+                "No SPF/DMARC configured",
+                "bluepeakconsulting.net accepts mail but has no SPF or DMARC records — "
+                "not conclusive on its own, but weaker than an established company's "
+                "mail setup usually looks.",
             ),
             _signal(
                 "content_risk", "salary_outlier_moderate", "medium",

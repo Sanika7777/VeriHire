@@ -26,11 +26,15 @@ US-skewed. Concretely, that means:
   all — a company with no domain on file gets `Unrated` on that dimension,
   not a default middling score. Absence of evidence is not evidence of
   fraud, and we don't pretend otherwise.
-- **Registry lookups** (OpenCorporates/MCA) and **Safe Browsing** blocklist
-  checks require API keys. Without them, those checks report themselves as
-  "unavailable" rather than silently passing — but it does mean a
-  deployment without those keys configured is working with less signal
-  than the full design calls for.
+- **Company registry matching is not implemented.** We evaluated
+  OpenCorporates and dropped it — it's a paid API with weak coverage of
+  Indian jurisdictions, which is our primary market. `company_legitimacy`
+  is based on WHOIS/RDAP domain age, DNS (MX/SPF/DMARC), and TLS
+  certificate checks only.
+- **Safe Browsing** blocklist checks require an API key. Without it, that
+  check reports itself as "unavailable" rather than silently passing — but
+  it does mean a deployment without that key configured is working with
+  less signal than the full design calls for.
 - **Community signal** is entirely user-submitted and is gameable at low
   report/review volume — a handful of coordinated fake reports or reviews
   can currently move a score more than they should. Reviewer credibility
@@ -38,9 +42,9 @@ US-skewed. Concretely, that means:
 
 ## Coverage gaps
 
-- Company registry coverage is incomplete outside jurisdictions
-  OpenCorporates/MCA actually index, and degrades to "not checked" outside
-  those.
+- No company registry check at all (see above) — a registration-authority
+  cross-check like MCA/data.gov.in for Indian entities remains a possible
+  future addition if a suitable free/low-cost source is found.
 - WHOIS/RDAP domain-age data is unavailable for some registrars and some
   ccTLDs.
 - The URL-safety sub-score currently combines lexical heuristics with

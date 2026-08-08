@@ -46,7 +46,6 @@ class Settings(BaseSettings):
     sentry_dsn: str | None = None
 
     safe_browsing_api_key: SecretStr | None = None
-    opencorporates_api_key: SecretStr | None = None
 
     ml_artifacts_dir: str = "../../services/ml/artifacts"
 

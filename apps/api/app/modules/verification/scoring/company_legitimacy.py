@@ -1,5 +1,5 @@
 from app.core.enums import SignalSeverity, SubScoreCode
-from app.integrations import company_registry, dns_checks, tls_checks, whois_rdap
+from app.integrations import dns_checks, tls_checks, whois_rdap
 from app.modules.companies.models import Company
 from app.modules.verification.scoring.signals import Signal, SubScoreResult
 
@@ -17,8 +17,8 @@ async def score_company_legitimacy(company: Company) -> SubScoreResult:
                     code="no_domain_to_check",
                     severity=SignalSeverity.INFO,
                     title="No domain to verify",
-                    detail="This company has no website domain on file, so registry and "
-                    "domain checks could not run.",
+                    detail="This company has no website domain on file, so domain-age, "
+                    "DNS, and certificate checks could not run.",
                 )
             ],
         )
@@ -126,38 +126,6 @@ async def score_company_legitimacy(company: Company) -> SubScoreResult:
                 severity=SignalSeverity.MEDIUM,
                 title="Site is not reachable over HTTPS",
                 detail=tls_report.error or f"Could not establish a TLS connection to {domain}.",
-            )
-        )
-
-    registry = await company_registry.check_company_registry(company.name)
-    if registry.checked:
-        checks_run += 1
-        if registry.matched:
-            points += 25
-            signals.append(
-                Signal(
-                    code="registry_match",
-                    severity=SignalSeverity.INFO,
-                    title="Company registry match found",
-                    detail=f"Found a matching registration in {registry.jurisdiction}.",
-                )
-            )
-        else:
-            signals.append(
-                Signal(
-                    code="registry_no_match",
-                    severity=SignalSeverity.MEDIUM,
-                    title="No company registry match",
-                    detail="No matching business registration was found.",
-                )
-            )
-    else:
-        signals.append(
-            Signal(
-                code="registry_check_unavailable",
-                severity=SignalSeverity.INFO,
-                title="Registry lookup unavailable",
-                detail=registry.error or "Company registry integration is not configured.",
             )
         )
 
