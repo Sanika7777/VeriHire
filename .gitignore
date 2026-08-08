@@ -38,3 +38,8 @@ services/ml/mlruns/
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+# Stray downloaded packages / datasets that don't belong in the repo
+*.deb
+/fake_job_postings.csv
+/phiusiil_phishing_urls.csv
