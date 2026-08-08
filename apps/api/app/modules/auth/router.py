@@ -37,19 +37,34 @@ def _set_refresh_cookie(response: Response, tokens: TokenPair) -> None:
         int((tokens.refresh_expires_at - datetime.now(tokens.refresh_expires_at.tzinfo)).total_seconds()),
         0,
     )
+    # In development, web and api share a site (different localhost ports),
+    # so Lax works and avoids needing Secure over plain http. In every
+    # deployed environment the web app (Vercel) and api (Fly/Render) are on
+    # different registrable domains — a genuinely cross-site request — so
+    # the cookie needs SameSite=None, which browsers only honor if Secure
+    # is also set.
+    is_development = settings.environment == "development"
     response.set_cookie(
         key=REFRESH_COOKIE_NAME,
         value=tokens.refresh_token,
         max_age=max_age,
         httponly=True,
-        secure=settings.environment != "development",
-        samesite="lax",
+        secure=not is_development,
+        samesite="lax" if is_development else "none",
         path=REFRESH_COOKIE_PATH,
     )
 
 
 def _clear_refresh_cookie(response: Response) -> None:
-    response.delete_cookie(key=REFRESH_COOKIE_NAME, path=REFRESH_COOKIE_PATH)
+    # Browsers only clear a cookie when secure/samesite match how it was
+    # set — mismatched attributes silently no-op instead of deleting it.
+    is_development = get_settings().environment == "development"
+    response.delete_cookie(
+        key=REFRESH_COOKIE_NAME,
+        path=REFRESH_COOKIE_PATH,
+        secure=not is_development,
+        samesite="lax" if is_development else "none",
+    )
 
 
 @router.post(
