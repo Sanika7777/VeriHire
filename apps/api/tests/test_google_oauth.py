@@ -6,6 +6,7 @@ import pytest
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.core.errors import NotConfiguredError
 from app.modules.auth import service as auth_service_module
 from app.modules.auth.service import AuthService
@@ -15,8 +16,15 @@ STATE_KEY = "auth:google-oauth-state:test-state"
 
 
 async def test_start_google_oauth_raises_when_not_configured(
-    db_session: AsyncSession, redis_client: Redis[str]
+    db_session: AsyncSession, redis_client: Redis[str], monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    # Explicitly clear rather than relying on the ambient environment/.env
+    # having no Google OAuth credentials — a developer with real local
+    # credentials configured would otherwise get a spurious failure here.
+    settings = get_settings()
+    monkeypatch.setattr(settings, "google_oauth_client_id", None)
+    monkeypatch.setattr(settings, "google_oauth_client_secret", None)
+
     service = AuthService(db_session, redis_client)
     with pytest.raises(NotConfiguredError):
         await service.start_google_oauth(redirect_uri="http://localhost:3000/callback")

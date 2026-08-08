@@ -36,7 +36,7 @@ def create_app() -> FastAPI:
 
     configure_logging(json_logs=settings.environment != "development")
 
-    if settings.sentry_dsn:
+    if settings.sentry_dsn and settings.environment not in ("development", "test"):
         sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.environment)
 
     app = FastAPI(
