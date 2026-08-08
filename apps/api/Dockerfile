@@ -20,4 +20,7 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Hosting platforms (Render, etc.) assign a port at runtime via $PORT and
+# expect the process to bind to it; docker-compose doesn't set one, so this
+# falls back to 8000 to match its "8000:8000" port mapping.
+CMD ["sh", "-c", "uv run uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
