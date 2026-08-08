@@ -3,12 +3,13 @@ from logging.config import fileConfig
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy.ext.asyncio import create_async_engine
 
 import app.db.all_models  # noqa: F401  (registers every model with Base.metadata)
 from alembic import context
 from app.core.config import get_settings
 from app.db.base import Base
+from app.db.session import build_database_url_and_connect_args
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -21,7 +22,15 @@ if config.config_file_name is not None:
 
 target_metadata = Base.metadata
 
-config.set_main_option("sqlalchemy.url", str(get_settings().database_url))
+# Same libpq -> asyncpg `sslmode` translation as app.db.session — a managed
+# Postgres connection string (Neon, Render, ...) would otherwise make
+# `alembic upgrade head` fail outright with an asyncpg TypeError. Built as
+# real Python objects (not the .ini-style string config) so connect_args
+# like `ssl=True` reach asyncpg as an actual bool, not the string "True".
+_DATABASE_URL, _CONNECT_ARGS = build_database_url_and_connect_args(
+    str(get_settings().database_url)
+)
+config.set_main_option("sqlalchemy.url", _DATABASE_URL)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -71,9 +80,9 @@ async def run_async_migrations() -> None:
 
     """
 
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
+    connectable = create_async_engine(
+        _DATABASE_URL,
+        connect_args=_CONNECT_ARGS,
         poolclass=pool.NullPool,
     )
 
